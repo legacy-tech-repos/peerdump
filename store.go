@@ -11,7 +11,6 @@ import (
 	"github.com/multiformats/go-base32"
 	b32 "github.com/multiformats/go-base32"
 	"github.com/multiformats/go-multiaddr"
-	"github.com/opentracing/opentracing-go/log"
 )
 
 // Must match current scheme defined in github.com/libp2p/go-libp2p-peerstore/pstoreds/addr_book.go
@@ -66,7 +65,6 @@ func (s Store) uniquePeerIds(extractor func(result query.Result) string) (peer.I
 	)
 
 	if results, err = s.ds.Query(q); err != nil {
-		log.Error(err)
 		return nil, err
 	}
 
