@@ -6,9 +6,11 @@ require (
 	github.com/AndreasBriese/bbloom v0.0.0-20190825152654-46b345b51c96 // indirect
 	github.com/dgraph-io/ristretto v0.0.3 // indirect
 	github.com/golang/protobuf v1.4.2 // indirect
+	github.com/golang/snappy v0.0.1 // indirect
 	github.com/ipfs/go-cid v0.0.6 // indirect
 	github.com/ipfs/go-datastore v0.4.4
 	github.com/ipfs/go-ds-badger v0.2.4
+	github.com/ipfs/go-ds-leveldb v0.4.2
 	github.com/ipfs/go-log v1.0.4 // indirect
 	github.com/ipfs/go-log/v2 v2.1.1 // indirect
 	github.com/libp2p/go-libp2p-core v0.6.0
@@ -18,6 +20,7 @@ require (
 	github.com/multiformats/go-base32 v0.0.3
 	github.com/multiformats/go-multiaddr v0.2.2
 	github.com/multiformats/go-multihash v0.0.14 // indirect
+	github.com/opentracing/opentracing-go v1.2.0 // indirect
 	go.uber.org/zap v1.15.0 // indirect
 	golang.org/x/crypto v0.0.0-20200707235045-ab33eee955e0 // indirect
 	golang.org/x/net v0.0.0-20200707034311-ab3426394381 // indirect

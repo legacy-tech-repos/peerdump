@@ -1,32 +1,34 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
-	"path/filepath"
 	"time"
 
-	badger "github.com/ipfs/go-ds-badger"
+	ds "github.com/ipfs/go-datastore"
+	bds "github.com/ipfs/go-ds-badger"
+	lds "github.com/ipfs/go-ds-leveldb"
 	"github.com/libp2p/go-libp2p-core/peer"
 )
 
-const defaultIpfsLitePath = "ipfslite"
+const (
+	// supported backends
+	levelDB = "leveldb"
+	badger  = "badger"
+)
 
 func main() {
-	var dir string
-	if input := os.Args; len(input) != 2 {
-		fail(usage(input[0]))
-	} else {
-		dir = input[1]
-	}
+	backend := flag.String("b", badger, fmt.Sprintf("backend type, currently supported: %s and %s", levelDB, badger))
+	rootPath := flag.String("p", ".", "path to datastore directory")
+	flag.Parse()
 
-	rootPath := filepath.Join(dir, defaultIpfsLitePath)
-	bds, err := badger.NewDatastore(rootPath, &badger.DefaultOptions)
+	dStore, err := initDatastore(*backend, *rootPath)
 	if err != nil {
-		fail(fmt.Sprintf("[ERR] initializing badger datastore: %v\n", err))
+		fail(fmt.Sprintf("[ERR] init datastore: %v\n", err))
 	}
 
-	store := NewStore(bds)
+	store := NewStore(dStore)
 
 	info, err := dumpPeers(store)
 	if err != nil {
@@ -50,6 +52,34 @@ func main() {
 				time.Unix(addr.Expiry, 0).Format("15:04:05 2006/01/02"))
 		}
 		fmt.Println()
+	}
+}
+
+func initDatastore(backend, rootPath string) (ds.Datastore, error) {
+	switch backend {
+	case badger:
+		opts := bds.DefaultOptions
+		opts.ReadOnly = true
+		store, err := bds.NewDatastore(rootPath, &opts)
+		if err != nil {
+			return nil, fmt.Errorf("initializing Badger backend: %w", err)
+		}
+		return store, nil
+
+	case levelDB:
+		lopts := lds.Options{
+			NoSync:         true,
+			ErrorIfMissing: true,
+			ReadOnly:       true,
+		}
+		store, err := lds.NewDatastore(rootPath, &lopts)
+		if err != nil {
+			return nil, fmt.Errorf("initializing LevelDB backend: %w", err)
+		}
+		return store, nil
+
+	default:
+		return nil, fmt.Errorf("unsupported datastore backend: %s", backend)
 	}
 }
 
