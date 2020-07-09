@@ -5,7 +5,7 @@ Utility for dumping address information from the libp2p-based peerstore backed w
 ### Installation
 
 ```shell script
-go get github.com/dgtony/peerdump
+go get github.com/anytypeio/peerdump
 ```
 
 ### Usage

@@ -1,4 +1,4 @@
-module github.com/dgtony/peerdump
+module github.com/anytype/peerdump
 
 go 1.14
 
