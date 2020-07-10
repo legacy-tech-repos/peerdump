@@ -1,6 +1,6 @@
 # peerdump
 
-Utility for dumping address information from the libp2p-based peerstore backed with Badger.
+Utility for dumping address information from the libp2p-based peerstore.
 
 ### Installation
 
@@ -10,6 +10,10 @@ go get github.com/anytypeio/peerdump
 
 ### Usage
 
+Run utility with a flag `-p` pointing to the data directory.
+
 ```shell script
-peerdump <root-path>
+peerdump -p <root-path>
 ```
+
+Optional flag `-b` sets type of underlying storage backend. Currently, it supports two backend: *Badger* and *LevelDB*.
