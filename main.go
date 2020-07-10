@@ -25,14 +25,14 @@ func main() {
 
 	dStore, err := initDatastore(*backend, *rootPath)
 	if err != nil {
-		fail(fmt.Sprintf("[ERR] init datastore: %v\n", err))
+		fail(fmt.Errorf("init datastore: %w", err))
 	}
 
 	store := NewStore(dStore)
 
 	info, err := dumpPeers(store)
 	if err != nil {
-		fail(err.Error())
+		fail(err)
 	}
 
 	if len(info) == 0 {
@@ -101,14 +101,7 @@ func dumpPeers(store *Store) (map[peer.ID][]PeerAddr, error) {
 	return result, nil
 }
 
-func usage(cmdName string) string {
-	return fmt.Sprintf("Usage: %s <root-path>\n", cmdName)
-}
-
-func fail(reason string) {
-	if len(reason) > 0 {
-		fmt.Println(reason)
-	}
-
+func fail(err error) {
+	fmt.Printf("[ERR] %s\n", err.Error())
 	os.Exit(1)
 }
