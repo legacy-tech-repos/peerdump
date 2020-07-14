@@ -21,9 +21,14 @@ const (
 func main() {
 	backend := flag.String("b", badger, fmt.Sprintf("backend type, currently supported: %s and %s", levelDB, badger))
 	rootPath := flag.String("p", ".", "path to datastore directory")
+	unsafeMode := flag.Bool("u", false, "unsafe datastore access")
 	flag.Parse()
 
-	dStore, err := initDatastore(*backend, *rootPath)
+	if *unsafeMode {
+		fmt.Println("[WARN] unsafe datastore access")
+	}
+
+	dStore, err := initDatastore(*backend, *rootPath, !*unsafeMode)
 	if err != nil {
 		fail(fmt.Errorf("init datastore: %w", err))
 	}
@@ -55,32 +60,27 @@ func main() {
 	}
 }
 
-func initDatastore(backend, rootPath string) (ds.Datastore, error) {
+func initDatastore(backend, rootPath string, safe bool) (store ds.Datastore, err error) {
 	switch backend {
 	case badger:
 		opts := bds.DefaultOptions
-		opts.ReadOnly = true
-		store, err := bds.NewDatastore(rootPath, &opts)
-		if err != nil {
-			return nil, fmt.Errorf("initializing Badger backend: %w", err)
+		if safe {
+			opts.ReadOnly = true
 		}
-		return store, nil
+		store, err = bds.NewDatastore(rootPath, &opts)
 
 	case levelDB:
-		lopts := lds.Options{
-			NoSync:         true,
-			ErrorIfMissing: true,
-			ReadOnly:       true,
+		opts := lds.Options{ErrorIfMissing: true}
+		if safe {
+			opts.ReadOnly = true
 		}
-		store, err := lds.NewDatastore(rootPath, &lopts)
-		if err != nil {
-			return nil, fmt.Errorf("initializing LevelDB backend: %w", err)
-		}
-		return store, nil
+		store, err = lds.NewDatastore(rootPath, &opts)
 
 	default:
-		return nil, fmt.Errorf("unsupported datastore backend: %s", backend)
+		err = fmt.Errorf("unsupported datastore backend: %s", backend)
 	}
+
+	return
 }
 
 func dumpPeers(store *Store) (map[peer.ID][]PeerAddr, error) {
